@@ -93,7 +93,6 @@
 }
 
 
-
 .modal {
     display: none;
     position: fixed;
@@ -730,6 +729,7 @@ body {
     />
   </div>
 </div>
+
 <div class="menu-row">
   <div style="width: 130px;"></div>
   <div class="custom-button green">
@@ -1006,6 +1006,7 @@ updateOverlayFilter();
 
         let currentObjectId = 8900;
         let deleteMode = false;
+        let routeMode = false;
         const markers = [];
 
         function calculateCourse(lat1, lng1, lat2, lng2) {
@@ -1127,16 +1128,14 @@ updateOverlayFilter();
                 modalBackground.style.display = 'none';
             }
         }
+map.on('click', (e) => {
+    if (deleteMode) return;
+    if (routeMode) return; // ⛔ маршрутный режим
 
-        map.on('click', (e) => {
-            if (deleteMode) return;
+    const { lat, lng } = e.latlng;
 
-            const { lat, lng } = e.latlng;
-
-            // Get speed input via modal
-            showSpeedModal((speed) => {
-                // Get target input via modal
-                showTargetModal((targetLat, targetLng) => {
+    showSpeedModal((speed) => {
+        showTargetModal((targetLat, targetLng) => {
 
             const objectId = generateId();
             let iconUrl;
@@ -1170,8 +1169,11 @@ updateOverlayFilter();
     // Условия для выбора иконки в зависимости от скорости
     if (speed >= 120 && speed <= 121) {
         iconUrl = 'supercam.png';
-    } else if (speed > 120 && speed <= 200) {
-        iconUrl = 'shahed.png';
+} else if (speed > 120 && speed <= 200) {
+
+    // случай иконки — создаём случай 1 раз
+    const random = Math.random();
+    iconUrl = random < 0.3 ? 'neyst tip.png' : 'shahed.png';
     } else if (speed >= 7559 && speed < 7560) {
         iconUrl = 'iskander.png';
     } else if (speed >= 950 && speed <= 951) {
@@ -1304,8 +1306,8 @@ updateOverlayFilter();
         <div class="icon-container ${iconClass}">
             <img src="${iconUrl}" class="icon" />
              <div class="info-container ${shiftedClass} ${shiftedClasss}">
-                <span class="label-container ${iconClass}">${objectId3}</span> 
-                <span class="r-container ${iconClass}">ЛБ</span>            
+                <span class="label-container ${iconClass}">${objectId3}р</span> 
+                <span class="r-container ${iconClass}">ЛБ·</span>            
             </div>
         </div>
     `;
@@ -1316,8 +1318,8 @@ updateOverlayFilter();
         <div class="icon-container ${iconClass}">
             <img src="${iconUrl}" class="icon" />
              <div class="info-container ${shiftedClass} ${shiftedClasss}">
-                <span class="label-container ${iconClass}">${objectId}</span> 
-                <span class="r-container ${iconClass}">ПП</span>                
+                <span class="label-container ${iconClass}">${objectId}р</span> 
+                <span class="r-container ${iconClass}">ПП·</span>                
             </div>
         </div>
     `;
@@ -1328,8 +1330,8 @@ updateOverlayFilter();
         <div class="icon-container ${iconClass}">
             <img src="${iconUrl}" class="icon" />
             <div class="info-container ${shiftedClass} ${shiftedClasss}">
-                <span class="label-container ${iconClass}">0${objectId2}</span>
-                <span class="r-container ${iconClass}">СВ</span>
+                <span class="label-container ${iconClass}">0${objectId2}р</span>
+                <span class="r-container ${iconClass}">СВ·</span>
             </div>
         </div>
     `;
@@ -1340,8 +1342,8 @@ updateOverlayFilter();
         <div class="icon-container ${iconClass}">
             <img src="${iconUrl}" class="icon" />
             <div class="info-container ${shiftedClass} ${shiftedClasss}">
-                <span class="label-container ${iconClass}">0${objectId2}</span>
-                <span class="r-container ${iconClass}">ЗЛ</span>
+                <span class="label-container ${iconClass}">0${objectId2}р</span>
+                <span class="r-container ${iconClass}">ЗЛ·</span>
             </div>
         </div>
     `;
@@ -1351,8 +1353,8 @@ updateOverlayFilter();
         <div class="icon-container ${iconClass}">
             <img src="${iconUrl}" class="icon" />
              <div class="info-container ${shiftedClass} ${shiftedClasss}">
-                <span class="label-container ${iconClass}">${objectId}</span>
-                <span class="r-container ${iconClass}">ПП</span>  
+                <span class="label-container ${iconClass}">${objectId}р</span>
+                <span class="r-container ${iconClass}">ПП·</span>  
             </div>
         </div>
     `;
@@ -1941,7 +1943,6 @@ function calculateNewPosition(lat1, lon1, speedMps, deltaTime, lat2, lon2) {
         lon1 + (lon2 - lon1) * fraction
     ];
 }
-
 function openCoordsModal(callback) {
     const background = document.createElement('div');
     background.className = 'modal-background show';
@@ -2014,6 +2015,8 @@ function openCoordsModal(callback) {
         document.body.removeChild(background);
     };
 }
+
+
 // ==== Удаление маркера без удаления линии ====
 // ==== Клик по маркеру ====
 // ==== Клик по маркеру ====
@@ -2248,12 +2251,20 @@ function getNextObjectId3() {
 
         document.getElementById('zoom-in').onclick = () => map.zoomIn();
         document.getElementById('zoom-out').onclick = () => map.zoomOut();
-                  const img = document.getElementById('toggleLayersImg');
+          const img = document.getElementById('toggleLayersImg');
   const layers = document.querySelector('.leaflet-control-layers');
 
   img.addEventListener('click', () => {
     layers.classList.toggle('active');
   });
+let routeLine = null;
+let routeVisible = false;
+
+/* твои координаты, которые УЖЕ есть */
+let routeCoords = [
+  [fromLat, fromLng],
+  [toLat, toLng]
+];
 
     </script>
 </body>
